@@ -18,6 +18,7 @@ jobs:
 
     permissions:
       contents: read
+      id-token: write
 
     steps:
       - uses: actions/checkout@v4
@@ -25,12 +26,13 @@ jobs:
       - name: Set up Terraform
         uses: hashicorp/setup-terraform@v3
 
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
+      # ✅ Azure Login (replaces AWS credentials)
+      - name: Azure Login
+        uses: azure/login@v2
         with:
-          aws-access-key-id:     ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region:            ${{ secrets.AWS_REGION }}
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
 
       - name: Terraform Init
         working-directory: terraform
@@ -49,8 +51,8 @@ jobs:
 
       - name: Prepare SSH key
         run: |
-          echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_ed25519
-          chmod 600 id_ed25519
+          echo "${{ secrets.SSH_PRIVATE_KEY }}" > id_rsa
+          chmod 600 id_rsa
 
       - name: Run Ansible playbook
         uses: dawidd6/action-ansible-playbook@v2
@@ -58,7 +60,7 @@ jobs:
           playbook: ansible/site.yml
           inventory: |
             [all]
-            ${{ env.PUBLIC_IP }} ansible_user=ubuntu ansible_ssh_private_key_file=./id_ed25519
+            ${{ env.PUBLIC_IP }} ansible_user=azureuser ansible_ssh_private_key_file=./id_rsa
           requirements: ""
           options: |
             -e IMAGE_REPO=${{ env.IMAGE_NAME }}

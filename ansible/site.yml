@@ -3,7 +3,7 @@
   hosts: all
   become: true
   vars:
-    image_repo: "{{ lookup('env', 'IMAGE_REPO') | default('yourdockerhub/flask-hello') }}"
+    image_repo: "{{ lookup('env', 'IMAGE_REPO') | default('pritamworld/flask-hello') }}"
     image_tag: "{{ lookup('env', 'IMAGE_TAG') | default('latest') }}"
     grafana_admin_password: "{{ lookup('env', 'GRAFANA_ADMIN_PASSWORD') | default('admin') }}"
   tasks:
