@@ -14,8 +14,7 @@ terraform-azure/crash.log
 terraform-azure/crash.*.log
 
 # Ignore variable files that might contain secrets
-terraform-azure/*.tfvars
-terraform-azure/*.tfvars.json
+
 
 # Ignore override files
 terraform-azure/override.tf
